@@ -1,0 +1,917 @@
+<?php
+  ob_start();
+  session_start();
+  include_once 'config/db-config.php';
+  $login_id=$_SESSION['login_id'];
+  if (isset($_POST['submit'])) {
+      $Brand_id           = mysqli_real_escape_string($con,$_POST['Brand_id']); 
+      $Cat_id             = mysqli_real_escape_string($con,$_POST['Cat_id']);
+      $Subcat_id          = mysqli_real_escape_string($con,$_POST['Subcat_id']);
+      $sqlSub=mysqli_query($con,"select * from tbl_sub_category where id='$Subcat_id'");
+  $RowSub=mysqli_fetch_array($sqlSub);
+   $SubWeight=$RowSub['Weight'];
+  
+        $Title              = mysqli_real_escape_string($con,$_POST['Title']);
+      $Article            = mysqli_real_escape_string($con,$_POST['Article']);
+      $Views              = mysqli_real_escape_string($con,$_POST['Views']);
+      $Tag                = mysqli_real_escape_string($con,$_POST['Tags']);
+  
+  
+  if($_FILES['frontphoto']['name']!==''){
+      $FrontPhoto = rand().$_FILES['frontphoto']['name'];
+      move_uploaded_file($_FILES["frontphoto"]["tmp_name"], "../admin/IMG/product/".$FrontPhoto);
+  }
+  
+  
+      $Upper_materialid   = mysqli_real_escape_string($con,$_POST['Upper_materialid']);
+      $sole_materialid    = mysqli_real_escape_string($con,$_POST['sole_materialid']);
+      $type_id            = mysqli_real_escape_string($con,$_POST['type_id']);
+      $Status             = mysqli_real_escape_string($con,$_POST['Status']);
+      $Gst_type           = mysqli_real_escape_string($con,$_POST['Gst_type']);
+      $packing_materialid = mysqli_real_escape_string($con,$_POST['packing_materialid']);
+      $Description        = mysqli_real_escape_string($con,$_POST['Description']);
+      $Commission_id        =mysqli_real_escape_string($con,$_POST['Commission_id']);
+        $Hsn_code        =mysqli_real_escape_string($con,$_POST['Hsn_code']);
+       $gst_rate        =mysqli_real_escape_string($con,$_POST['gst_rate']);
+      $login           = $_SESSION['login'];
+        $status             = mysqli_real_escape_string($con,$_POST['status']);
+        if($status==''){ $status="Approved";}
+      $contt              = mysqli_real_escape_string($con,$_POST['Color_id']);
+     $cont= count(array_filter($contt));
+      //echo  $mcount; die();
+      $Color           = array_filter($_POST['Color_id']);
+    // print_r($Color); echo ("--------");
+      $Size               = $_POST['Size'];
+     
+      $Price              = $_POST['Price'];
+      $Sale_price         = $_POST['Sale_price'];
+      
+      $Discount           = $_POST['Discount'];
+      $Packing            = $_POST['Packing'];
+      $Stock              = $_POST['Stock'];
+      $Weight             = $_POST['Weight'];
+        $LivePrice             = $_POST['LivePrice'];
+  //print_r ( array_filter($_FILES['Img1'] );die();
+      // $Img1             = $_FILES['Img1']['tmp_name'] ;
+    
+  
+      // $Img2            = $_FILES['Img2']["name"];
+  
+  
+      // $Img3              =$_FILES['Img1']["name"];
+      // $Img4             = $_FILES['Img1']["name"];
+      // $Img5             = $_FILES['Img1']["name"];
+      
+     $sqlch = mysqli_query($con, "select * from tbl_productmaster where title='$Title'");
+      $total = mysqli_num_rows($sqlch);
+      if ($total == 0) {
+            $sqlsave = "insert into tbl_productmaster (FrontPhoto,Brand_id,Cat_id,Subcat_id,Title,Article,Tag,Views,Upper_materialid,sole_materialid,type_id,Hsn_code,gst_rate,Gst_type,packing_materialid,Description,Commission_id,Status,Login,Login_id)
+  VALUES('$FrontPhoto','$Brand_id','$Cat_id','$Subcat_id','$Title','$Article','$Tag','$Views','$Upper_materialid','$sole_materialid','$type_id','$Hsn_code','$gst_rate','$Gst_type','$packing_materialid','$Description','$Commission_id','$status','$login','$login_id')"; 
+         $savee   = mysqli_query($con, $sqlsave);
+          if ($savee) {
+              $last_id = mysqli_insert_id($con);
+              
+              
+              
+            //  for ($row = 0; $row < $cont; $row++) {
+               foreach( $Color as $key => $value) { 
+                 $TotalWeight=$Packing[$key]*$SubWeight;
+                 $sqcccl = "INSERT INTO tbl_productdetail (`Pro_id`, `Color_id`, `Size`, `Price`, `Sale_price`, `Discount`, `Packing`, `Stock`,`LivePrice`, `Weight`) VALUES ('$last_id','$Color[$key]','$Size[$key]','$Price[$key]','$Sale_price[$key]','$Discount[$key]','$Packing[$key]','$Stock[$key]','$LivePrice[$key]','$TotalWeight')"; 
+                 if ($con->query($sqcccl) === TRUE) {
+                  } else {
+                  }
+              } 
+              
+     $str=   "delete from tbl_productdetail where Weight='0' ";
+          $con->query($str);
+              foreach( $Color as $key => $value) {                         
+      $errors= array();
+       if($_FILES['Img1']['name']!=''){
+      $file_name1 = rand().$_FILES['Img1']['name'][$key];
+      move_uploaded_file($_FILES["Img1"]["tmp_name"][$key], "../admin/IMG/product/".$file_name1);
+  }
+    if($_FILES['Img2']['name']!=''){
+        $file_name2 = rand().$_FILES['Img2']['name'][$key];
+         move_uploaded_file($_FILES["Img2"]["tmp_name"][$key], "../admin/IMG/product/".$file_name2);
+    }
+     if($_FILES['Img3']['name']!=''){
+        $file_name3 = rand().$_FILES['Img3']['name'][$key];
+         move_uploaded_file($_FILES["Img3"]["tmp_name"][$key], "../admin/IMG/product/".$file_name3);
+    }
+      if($_FILES['Img4']['name']!=''){
+         $file_name4= rand().$_FILES['Img4']['name'][$key];}
+   move_uploaded_file($_FILES["Img4"]["tmp_name"][$key], "../admin/IMG/product/".$file_name4);
+   
+               if($_FILES['Img5']['name']!=''){$file_name5= rand().$_FILES['Img5']['name'][$key];
+                move_uploaded_file($_FILES["Img5"]["tmp_name"][$key], "../admin/IMG/product/".$file_name5);
+           }
+  
+      //$file_size =$_FILES['Img1']['size'][$key];
+      //$file_tmp =$_FILES['Img1']['tmp_name'][$key];
+      //$file_type=$_FILES['Img1']['type'][$key];  
+        //   if($file_size > 8097152){
+        // $errors[]='File size must be less than 2 MB';
+        //   }   
+          $query="INSERT into tbl_product_img (`Pro_id`,`Color_id`,`Img1`,`Img2`,`Img3`,`Img4`,`Img5`) VALUES('$last_id','".$value."','".$file_name1."','".$file_name2."','".$file_name3."','".$file_name4."','".$file_name5."') "; 
+      
+          // $desired_dir="IMG/product/";
+          // if(empty($errors)==true){
+          //     if(is_dir($desired_dir)==false){
+          //         mkdir("$desired_dir", 0700);    // Create directory if it does not exist
+          //     }
+          //     if(is_dir("$desired_dir/".$file_name)==false){
+          //         move_uploaded_file($file_tmp,"$desired_dir/".$file_name);
+          //     }else{                  // rename the file if another one exist
+          //         $new_dir="$desired_dir/".$file_name.time();
+          //          rename($file_tmp,$new_dir) ;       
+          //     }
+      mysqli_query($con, $query); 
+  unset($_SESSION['Weight']);
+          } 
+      }
+  
+  
+  echo "<script>
+  alert('Sucessfully Saved data');
+  document.location.replace('product-list.php');
+  </script>";
+          }
+       else {
+          echo "<script>
+  alert('Product Name already exist!');
+  document.location.replace('add-product.php');
+  </script>";
+      }
+  }
+  ?> 
+<?php
+  include('header.php'); ?>
+<?php
+  include('sidebar.php'); ?>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<link href="plugins/animate-css/animate.css" rel="stylesheet" />
+<link href="plugins/jquery-datatable/skin/bootstrap/css/dataTables.bootstrap.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-1.9.1.min.js"></script> 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<style>
+  #example table {
+  counter-reset: rowNumber;
+  }
+  #example table tr > td:first-child {
+  counter-increment: rowNumber;
+  }
+  #example table tr td:first-child::before {
+  content: counter(rowNumber);
+  min-width: 1em;
+  margin-right: 0.5em;
+  }
+  .weight-new {
+  width: 100%;
+  height: 34px;
+  border: none;
+  border-radius: 7px;
+  box-shadow: 0px 0px 6px 0px #a5a2a2;
+  }
+  .form-control {
+  display: block;
+  width: 100%;
+  height: 34px;
+  padding: 6px 3px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #555;
+  background-color: #fff;
+  background-image: none;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+  -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
+  -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+  transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+  }
+  .bootstrap-select.btn-group .dropdown-toggle .caret {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  margin-top: -2px;
+  vertical-align: middle;
+  }
+  input#tot_weight37 {
+  width: 90%;
+  height: 33px;
+  border-radius: 4px;
+  border: none;
+  }
+  button.btn-new {
+  background: #ff0f0f;
+  padding: 5px 5px;
+  border-radius: 5px;
+  color: #fff;
+  float: left;
+  margin: 6px 2px;
+  border: none;
+  font-size: 12px;
+  }
+  button.add {
+  float: left;
+  padding: 5px 5px;
+  background: #0a0a0a;
+  color: #fff;
+  margin: 6px 0px;
+  border: none;
+  border-radius: 5px;
+  font-size: 12px
+  }
+  h3.basics {
+  font-size: 17px;
+  color: #ffffff;
+  font-weight: 600;
+  padding: 8px 0px 8px 0px;
+  text-align: center;
+  background-color: #009688;
+  }
+  h2.hedd {
+  font-size: 22px !important;
+  text-align: center;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.1px;
+  background-color: #009688;
+  padding: 12px 5px 12px 5px;
+  }
+  ul.dropdown-menu.inner { 
+  overflow-y: scroll !important;
+  height: 163px !important;
+  }
+  img.shoessimg {
+  width: 350px;
+  height: 350px;
+  padding: 25px 25px;
+  }
+  .display-description p {
+  font-size: 12px;
+  padding: 0px 10px;
+  text-align: justify;
+  color: #7b7b7b;
+  }
+  .full-display {
+  padding: 10px 16px;
+  box-shadow: 0px 0px 2px 0px #c7c7c7;
+  }
+  .upload-photo {
+  padding: 1px 10px;
+  }
+  .upload-photo p {
+  color: #009688;
+  margin-top: 15px;
+  font-weight: 600;
+  }
+  .full {
+  display: -webkit-box;
+  }
+  .half {
+  width: 40%;
+  }
+  .productimg {
+  margin: 13px 0px 13px 0px;
+  border: 1px solid black;
+  padding: 0px 14px 0px 14px;
+  }
+  .half.new1 {
+  float: left;
+  width: 39%;
+  margin-left: 18px;
+  }
+  .form-group.hsnhalf {
+  width: 50%;
+  float: left;
+  }
+  .btn-default-new123{
+  background: #009688 !important;
+  padding: 7px !important;
+  color: #fff;
+  border-radius: 4px;
+  margin: 12px;
+  }
+  .btn-danger.shi {
+  padding: 5px 12px;
+  border-radius: 3px;
+  margin-top: 2px;
+  }
+  .save {
+  position: relative;
+  left: 80em;
+  right: 0;
+  }
+  button.btn-default.shi {
+  background: #009688 !important;
+  padding: 6px 7px !important;
+  color: #fff;
+  border-radius: 3px;
+  }
+  thead.color-main tr td {
+  font-size: 13px;
+  }
+  thead.color-main {
+  background: #efefef;
+  }
+  button.btn-default.shi.green {
+  background: #05c10b !important;
+  }
+</style>
+<section class="content">
+  <div class="container-fluid">
+    <div class="block-header"></div>
+    <!-- Exportable Table -->
+    <div class="row clearfix">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+          <div class="header">
+            <h2 class="hedd">Add New Listing</h2>
+            <ul class="header-dropdown m-r--5">
+              <li class="dropdown">
+                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                <i class="material-icons">more_vert</i>
+                </a>
+                <ul class="dropdown-menu pull-right">
+                  <li><a href="javascript:void(0);">Action</a></li>
+                  <li><a href="javascript:void(0);">Another action</a></li>
+                  <li><a href="javascript:void(0);">Something else here</a></li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+          <div class="body">
+            <!-- <h2 class="card-inside-title">Different Widths</h2> -->
+            <div class="row clearfix"></div>
+            <form method="post" action=""  enctype="multipart/form-data">
+              <div class="col-sm-4">
+                <h3 class="basics">Basic Information</h3>
+                <div class="form-group">
+                  Brand
+                  <div class="form-line">
+                    <select class="form-control" name="Brand_id"  onchange="showHint(this.value)" required>
+                      <option>--Select--</option>
+                      <?php   $brand = mysqli_query($con, "select * from  tbl_create_approvebrand where Status='Approved' order by Brand "); while ($Fetchbrand = mysqli_fetch_array($brand)) { ?>
+                      <option value="<?php      echo $Fetchbrand['id']; ?>">
+                        <?php      echo $Fetchbrand['Brand']; ?>
+                      </option>
+                      <?php   } ?>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  Category
+                  <div class="form-line">
+                    <select class="form-control" name="Cat_id"  onChange="ViewSubCategory(this.value)" required>
+                      <option>--Select--</option>
+                      <?php   $Category = mysqli_query($con, "select * from tbl_category  where Status='Active' order by category"); while ($FetchCategory = mysqli_fetch_array($Category)) { ?>
+                      <option value="<?php      echo $FetchCategory['id']; ?>">
+                        <?php      echo $FetchCategory['category']; ?>
+                      </option>
+                      <?php   } ?>
+                    </select>
+                    <script>
+                      function ViewSubCategory(str) {
+                      if (str.length == 0) {
+                      document.getElementById("ViewSubCategory").innerHTML = "";
+                      return;
+                      } else {
+                      var xmlhttp = new XMLHttpRequest();
+                      xmlhttp.onreadystatechange = function() {
+                      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                      document.getElementById("ViewSubCategory").innerHTML = xmlhttp.responseText;
+                      }
+                      }
+                      xmlhttp.open("GET", "viewSubCategory.php?Category_id=" + str, true);
+                      xmlhttp.send();
+                      
+                      }
+                      }
+                    </script>
+                  </div>
+                </div>
+                <div id="ViewSubCategory">
+                  <div class="form-group">
+                    Sub Category
+                    <div class="form-line">
+                      <select class="form-control" name="Subcat_id" >
+                        <option>Select</option>
+                      </select>
+                      <script>
+                        function get_weight(str) {
+                          //alert('hii');
+                        if (str.length == 0) {
+                        document.getElementById("viewweight").innerHTML = "";
+                        return;
+                        } else {
+                        var xmlhttp = new XMLHttpRequest();
+                        xmlhttp.onreadystatechange = function() {
+                        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                        document.getElementById("viewweight").innerHTML = xmlhttp.responseText;
+                        }
+                        }
+                        xmlhttp.open("GET", "viewweight.php?subcat_id=" + str, true);
+                        xmlhttp.send();
+                        
+                        }
+                        }
+                      </script>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  Product Title
+                  <div class="form-line">
+                    <input type="text" class="form-control" name="Title" required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  Product Article
+                  <div class="form-line">
+                    <input type="text" class="form-control" name="Article" required >
+                  </div>
+                </div>
+                <div class="form-group hsnhalf">
+                  HSN Code
+                  <div class="form-line">
+                    <select class="form-control" name="Hsn_code" onChange="Viewgst(this.value)" required>
+                      <option>--Select--</option>
+                      <?php   $hsn = mysqli_query($con, "select * from tbl_hsncodes where Status='Active' order by Hsn_code "); while ($Fetchhsn = mysqli_fetch_array($hsn)) { ?>
+                      <option value="<?php      echo $Fetchhsn['id']; ?>">
+                        <?php      echo $Fetchhsn['Hsn_code']; ?>
+                      </option>
+                      <?php   } ?>
+                    </select>
+                    <script>
+                      function Viewgst(str) {
+                        //alert('hii');
+                      if (str.length == 0) {
+                      document.getElementById("Viewgst").innerHTML = "";
+                      return;
+                      } else {
+                      var xmlhttp = new XMLHttpRequest();
+                      xmlhttp.onreadystatechange = function() {
+                      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                      document.getElementById("Viewgst").innerHTML = xmlhttp.responseText;
+                      }
+                      }
+                      xmlhttp.open("GET", "view-gst.php?Hsn_code=" + str, true);
+                      xmlhttp.send();
+                      //alert('done');
+                      }
+                      }
+                    </script>
+                  </div>
+                </div>
+                <div id="Viewgst" class="half new1">
+                  <div class="form-group">
+                    GST Rate <b>%</b>
+                    <div class="form-line">
+                      <input type="text" class="form-control" name="gst_rate" readonly>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <div id="viewweight">
+                  <div class="full-display">
+                    <div class="display-productimg">
+                      <img id="output" src="images/shoesss.jpg" class="shoessimg">
+                    </div>
+                    <div class="display-description">
+                      <p>Sandal refers to a light shoe with either straps or openwork upper attaching the sole to the foot. Women Heeled Footwear, Leather Sandals and Velcro Closure Footwear can be listed under this vertical but do not list Boots under Sandal. Kindly use Shoe vertical to list Boots and Flat Bellies. If the Women Slides Footwear</p>
+                    </div>
+                    <div class="upload-photo">
+                      <p>Upload Product Photo (For Homepage)</p>
+                      Size(500px(W) X 500px(H)) upto 50KB
+                      <input type="file" name="frontphoto"  accept="image/*" onchange="loadFile(event)" required>
+                      <script>
+                        var loadFile = function(event) {
+                          var output = document.getElementById('output');
+                          output.src = URL.createObjectURL(event.target.files[0]);
+                        };
+                      </script>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <h3 class="basics">Product Details</h3>
+                <div class="form-group">
+                  Upper Material
+                  <div class="form-line">
+                    <select class="form-control" name="Upper_materialid"  required>
+                      <option>--Select--</option>
+                      <?php   $UpperLevel = mysqli_query($con, "select * from tbl_uppermaterial where Status='Active' order by Material_name "); while ($FetchUpperLevel = mysqli_fetch_array($UpperLevel)) { ?>
+                      <option value="<?php      echo $FetchUpperLevel['id']; ?>">
+                        <?php      echo $FetchUpperLevel['Material_name']; ?>
+                      </option>
+                      <?php   } ?>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  Sole Material
+                  <div class="form-line">
+                    <select class="form-control" name="sole_materialid" required>
+                      <option>--Select--</option>
+                      <?php   $SoulMetrial = mysqli_query($con, "select * from tbl_solematerial where Status='Active' order by Solematerial_name "); while ($FetchSoulMetrial = mysqli_fetch_array($SoulMetrial)) { ?>
+                      <option value="<?php      echo $FetchSoulMetrial['id']; ?>">
+                        <?php      echo $FetchSoulMetrial['Solematerial_name']; ?>
+                      </option>
+                      <?php   } ?>
+                    </select>
+                  </div>
+                </div>
+                <script>
+                  function foot(str) {
+                  if (str.length == 0) {
+                  document.getElementById("foot").innerHTML = "";
+                  return;
+                  } else {
+                  var xmlhttp = new XMLHttpRequest();
+                  xmlhttp.onreadystatechange = function() {
+                  if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                  document.getElementById("foot").innerHTML = xmlhttp.responseText;
+                  }
+                  }
+                  xmlhttp.open("GET", "viewSubCategory.php?sub_id=" + str, true);
+                  xmlhttp.send();
+                  
+                  }
+                  }
+                </script>
+                <div id="foot">
+                  <div class="form-group">
+                    Type of Footwear
+                    <div class="form-line">
+                      <select class="form-control" name="type_id" required>
+                        <option>--Select--</option>
+                        <?php   $Type = mysqli_query($con, "select * from tbl_footweartype where Status='Active' order by Footwear_type "); while ($FetchType = mysqli_fetch_array($Type)) { ?>
+                        <option value="<?php      echo $FetchType['id']; ?>">
+                          <?php      echo $FetchType['Footwear_type']; ?>
+                        </option>
+                        <?php   } ?>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  Packing of Footwear
+                  <div class="form-line">
+                    <select class="form-control" name="packing_materialid" required>
+                      <option>--Select--</option>
+                      <?php   $pack = mysqli_query($con, "select * from  tbl_packingmaterial where Status='Active' order by Packing_name "); while ($Fetchpack = mysqli_fetch_array($pack)) { ?>
+                      <option value="<?php      echo $Fetchpack['id']; ?>">
+                        <?php      echo $Fetchpack['Packing_name']; ?>
+                      </option>
+                      <?php   } ?>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  Status
+                  <div class="form-line">
+                    <select class="form-control" name="status" required>
+                      <option value="Approved">Approved</option>
+                      <option value="Rejected">Rejected</option>
+                      <option value="InActive">InActive</option>
+                      <option value="Temprary_InActive">Temprary_InActive</option>
+                      <option value="Temprary_Rejected">Temprary_Rejected</option>
+                      <option value="Blocked">Blocked</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <script type="text/javascript" src="../latest.js"></script> <script type="text/javascript">
+                //<![CDATA[
+                        bkLib.onDomLoaded(function() { nicEditors.allTextAreas() });
+                  //]]>
+                  
+              </script>
+              <div class="col-sm-12">
+                <div class="form-group">
+                  <button type="button" class="btn-default shi" style="margin-bottom: 10px; padding: 5px; border: none;">Product Description (Text and Icons Same will be Displayed on  Website & App)</button>
+                  <div class="form-line">
+                    <textarea class="form-control" name="Description" placeholder="Product Description" ></textarea>
+                  </div>
+                </div>
+              </div>
+          </div>
+          <div class="row clearfix new1"> 
+          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 color-box">
+          <button type="button" class="btn-default shi" style="margin-bottom: 10px; padding: 5px; border: none;">Select Product Color Varients</button><br>
+          <div class="box new1">
+          <div class="color">
+          <div class="add-row"  >
+          <?php $x=0; $i=1;    $Color = mysqli_query($con, "select * from tbl_color where Status='Active' order by Color "); while ($FetchColor = mysqli_fetch_array($Color)) {  $i=$i++; ?>
+          <div class="btn-group new colors" id="colorbn<?php echo $FetchColor['id']; ?>">
+          <button type="button" class="btn" style="height: 30px; background-color: <?php echo $FetchColor['Color_code']; ?>;"></button>
+          <button type="button" class="btn btn-primary new11" style="background-color: #fff !important; color: #000 !important; border-left: 1px solid grey;">
+          <?php      echo $FetchColor['Color']; ?>
+          </button>
+          </div>
+          <?php   } ?>
+          </div>
+          </div> 
+          </div>
+          </div>
+          </div>
+          <?php   $i=1; $Color = mysqli_query($con, "select * from tbl_color where Status='Active' order by Color "); while ($FetchColor = mysqli_fetch_array($Color)) {  $i=$i+1; ?>
+          <script type="text/javascript">
+      $(document).ready(function(){ 
+    var counter = 2;
+ 
+    $("#addButton<?php echo $FetchColor['id']; ?>").click(function () {
+ 
+        if(counter>10){
+                alert("Only 10 textboxes allowed");
+                return false;
+        }   
+     
+        var newTextBoxDiv = $(document.createElement('tr'))
+             .attr("id", 'TextBoxDiv' + counter);
+     
+        newTextBoxDiv.after().html('<td class="col-sm-1"><input type="hidden" id="test2<?php echo $FetchColor['id']; ?>" name="Color_id[]" value=""><div class="btn-group new colors" id="colorbn<?php echo $FetchColor['id']; ?>"><button type="button" class="btn" style="height: 30px; background-color: <?php echo $FetchColor['Color_code']; ?>;"></button><button type="button" class="btn btn-primary new11" style="background-color: #fff !important; color: #000 !important; border-left: 1px solid grey;"><?php  echo $FetchColor['Color']; ?></button></div> </td>'+'<td class="col-sm-1" style="width: 4%;"><select  name="Size[]" class="form-control new12" required> <option value="">Select</option><?php   $size = mysqli_query($con, "select * from  tbl_sizes where Status='Active' order by sort "); while ($Fetchsize=mysqli_fetch_array($size)) { ?><option value="<?php echo $Fetchsize['id']; ?>"><?php echo $Fetchsize['Sizes']; ?></option><?php   } ?> </select> </td>' + '<td class="col-sm-1" style="width: 6%;"><input type="text" name="Price[]" class="form-control new12" required /></td>' + '<td class="col-sm-1" style="width: 6%;"><input type="text" name="Sale_price[]" id="itemamnt<?php echo $FetchColor['id']; ?>' + counter + '" class="form-control new12" required    ></td>' + '<td class="col-sm-1" style="width: 6%;"><input type="text" name="Discount[]" id="itemqty<?php echo $FetchColor['id']; ?>' + counter + '" class="form-control new12 itmqty" required   ></td>' + '<td class="col-sm-1" style="width: 6%;"><input type="mail" name="Packing[]"  id="packing<?php echo $FetchColor['id']; ?>" class="form-control" new12  required/></td>' +'<td class="col-sm-1" style="width: 6%;"><input type="text" name="Stock[]" class="form-control" new12 required/></td>'+'<td class="col-sm-1" style="width: 11%;"><input type="text" name="Weight[]" class="form-control" new12 required/></td>' + '<td class="col-sm-1" style="width: 7%;"> <input type="text" id="total<?php echo $FetchColor['id']; ?>' + counter + '" name="Weight[]"  class="form-control new12 total<?php echo $FetchColor['id']; ?>" required/></td>' + '<td class="col-sm-1" style="width: 7%;"> <button  type="button" class="btn-danger shi ibtnDel" id="del<?php echo $FetchColor['id']; ?>' + counter + '" onClick="$(this).closest("tr").hide();">Del Row</button></td>');
+     
+        newTextBoxDiv.appendTo("#tab_logic<?php echo $FetchColor['id']; ?>");
+     
+        counter++;
+     });
+
+   
+
+    $(document).on('keyup', '.itmqty', function(ev){       
+         // grab ID to get row number
+        thisID = $(this).attr("id");
+        rowNum = thisID.slice(-1); 
+        
+        //get Amount entered
+        amt = $('#itemamnt<?php echo $FetchColor['id']; ?>'+rowNum).val();
+        //get QTY
+        qty = $('#itemqty<?php echo $FetchColor['id']; ?>'+rowNum).val();        
+       $('#total<?php echo $FetchColor['id']; ?>'+rowNum).val(amt*qty/100);
+        
+      currentCount = counter-1;
+      var tot = 0;
+        $('.total<?php echo $FetchColor['id']; ?>').each(function() {
+            tot += parseFloat($(this).val());            
+        });
+          
+       $('#running_total').val(tot);    
+    });
+    
+    //$('#total').val($('#itm-qty').val() * $('#itm-amnt').val());
+
+      $("#tab_logic<?php echo $FetchColor['id']; ?>").on("click", ".ibtnDel", function (event) {
+        $(this).closest("tr").remove();       
+        counter -= 1
+    });
+});
+
+
+  
+
+    </script>
+          <div id="showdiv<?php echo $FetchColor['id']; ?>"  style="display: none;" >
+          <div class="row">
+          <div class="col-md-12 col-sm-6 column">
+
+    <table class="table table-bordered table-hover table order-list<?php echo $FetchColor['id']; ?>" id="tab_logic<?php echo $FetchColor['id']; ?>">
+<thead class="color-main">
+<tr >
+<th>Color</th>
+<th>Size_Group</th>
+<th>MRP</th>
+<th>Sale_Price</th>
+<th>Discount %</th>
+<th>Packing</th>
+<th>Stock(Catons)</th>
+<th>Weight(Carton) in Kg</th>
+<th>Live Price</th>
+   <script type="text/javascript">
+    var clicks = 0;
+    function onClick() {
+        clicks += 1;
+        document.getElementById("clicks").innerHTML = clicks;
+    };
+    </script>
+<th>  
+ <button type="button" id="addButton<?php echo $FetchColor['id']; ?>" class="btn-default shi green">More Size</button>
+
+</th>
+
+</tr>
+</thead>
+<tbody>
+<tr >
+<td class="col-sm-1"> 
+  <input type="hidden" id="test2<?php echo $FetchColor['id']; ?>" name="Color_id[]" value="">
+<div class="btn-group new colors" id="colorbn<?php echo $FetchColor['id']; ?>">
+<button type="button" class="btn" style="height: 30px; background-color: <?php echo $FetchColor['Color_code']; ?>;"></button>
+<button type="button" class="btn btn-primary new11" style="background-color: #fff !important; color: #000 !important; border-left: 1px solid grey;">
+<?php      echo $FetchColor['Color']; ?>
+</button>
+</div> </td>
+<td class="col-sm-1" style="width: 4%;">
+
+<select  name="Size[]" class="form-control new12" required>
+ <option value="">Select</option>
+<?php   $size = mysqli_query($con, "select * from  tbl_sizes where Status='Active' order by sort "); while ($Fetchsize = mysqli_fetch_array($size)) { ?>
+<option value="<?php echo $Fetchsize['id']; ?>"><?php echo $Fetchsize['Sizes']; ?></option>
+<?php   } ?>
+</select>
+
+</td>
+
+<td class="col-sm-1" style="width: 6%;">
+<input type="text" name="Price[]" class="form-control new12" required />
+</td>
+<td class="col-sm-1" style="width: 6%;">
+<input type="text" name="Sale_price[]"  id="itemamnt<?php echo $FetchColor['id']; ?>1" class="form-control new12" required   >
+</td>
+<td class="col-sm-1" style="width: 6%;">
+<input type="text" name="Discount[]" id="itemqty<?php echo $FetchColor['id']; ?>1" class="form-control new12 itmqty" required >
+</td>
+<td class="col-sm-1" style="width: 6%;">
+<input type="mail" name="Packing[]"  id="packing<?php echo $FetchColor['id']; ?>" class="form-control" new12  required/>
+</td>
+<td class="col-sm-1" style="width: 6%;">
+<input type="text" name="Stock[]" class="form-control" new12 required/>
+</td>
+<td class="col-sm-1" style="width: 11%;">
+<input type="text" name="Weight[]" class="form-control" new12 required/>
+</td>
+<td class="col-sm-1" style="width: 7%;">
+<input type="text" id="total<?php echo $FetchColor['id']; ?>1"  class="form-control total<?php echo $FetchColor['id']; ?> new12" required/>
+</td>  
+
+
+<!--td class="col-sm-1">
+<input class="ibtnDel btn btn-md btn-danger " value="Delete" type="button" onClick="$(this).closest('tr').remove();">
+</td-->
+<td class="col-sm-1">
+ 
+<button  type="button" id="del<?php echo $FetchColor['id']; ?>" class="btn-danger shi" onClick="$(this).closest('tr').hide();">Delete All</button>
+
+  
+
+</td>
+
+
+</tr>
+<tr id='addr1'></tr>
+</tbody>
+</table>
+        
+          </div>
+          </div>
+          </div>
+          <?php  } ?>
+ <?php  $i=1; $Color = mysqli_query($con, "select * from tbl_color where Status='Active' order by Color "); while ($FetchColor = mysqli_fetch_array($Color)) { $i=$i++;  $cclloor=$FetchColor['Color_code']; ?>  
+          <script>
+            $(document).ready(function() {
+            // $("#hide").click(function(){
+            //   $("p").hide();
+            // });
+            $("#addr0<?php echo $FetchColor['id']; ?>").show();
+            $("#showdiv<?php echo $FetchColor['id']; ?>").hide();
+            $("#imgdiv<?php echo $FetchColor['id']; ?>").hide();
+            $("#colorbn<?php echo $FetchColor['id']; ?>").click(function() {
+              <?php //$_POST['cd']=$FetchColor['id'];?>
+              $("#test2<?php echo $FetchColor['id']; ?>").val("<?php echo $FetchColor['id'];?>");
+              $("#addr0<?php echo $FetchColor['id']; ?>").show();
+            $("#showdiv<?php echo $FetchColor['id']; ?>").show();
+            $("#imgdiv<?php echo $FetchColor['id']; ?>").show();
+            $("#colorbn<?php echo $FetchColor['id']; ?>").hide();
+            var x = document.getElementById("colorbn<?php echo $FetchColor['id']; ?>").value;
+            document.getElementById("getcolor<?php echo $FetchColor['id']; ?>").innerHTML = x;
+            });
+            });
+            
+             $("#del<?php echo $FetchColor['id']; ?>").click(function(){
+              $("#showdiv<?php echo $FetchColor['id']; ?>").hide();
+              $("#imgdiv<?php echo $FetchColor['id']; ?>").hide();
+              $("#colorbn<?php echo $FetchColor['id']; ?>").show();
+            });
+          </script>
+          <?php } ?>
+          <?php   $i=1;  $Color = mysqli_query($con, "select * from tbl_color where Status='Active' order by Color "); while ($FetchColor = mysqli_fetch_array($Color)) { $i=$i++; ?>
+          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 product-add" id="imgdiv<?php echo $FetchColor['id']; ?>" style="display: none;">
+          <h5>Upload Images of Following Color Varient (Minumum 3 Images )</h5>
+          <div class="row">
+          <div class="col-lg-2 col-md-2">
+          <div class="btn-group new colors" id="colorbn<?php echo $FetchColor['id']; ?>">
+          <button type="button" class="btn" style="height: 30px; background-color: <?php echo $FetchColor['Color_code']; ?>;"></button>
+          <button type="button" class="btn btn-primary new11" style="background-color: #fff !important; color: #000 !important; border-left: 1px solid grey;">
+          <?php      echo $FetchColor['Color']; ?>
+          </button>
+          </div>
+          </div>
+          <div class="col-lg-2">
+          <div   style="width: 9rem;">
+          <img id="uploadPreview<?php echo $i;?><?php echo $FetchColor['id']; ?>" src="images/sh2.jpg" style="width: 100px; height: 100px;"class="productimg" />Size(500px(W) X 500px(H)) upto 50KB
+          <input id="uploadImage<?php echo $i;?><?php echo $FetchColor['id']; ?>" required type="file" name="Img1[]" onchange="PreviewImage<?php echo $i;?><?php echo $FetchColor['id']; ?>();" />
+          <script type="text/javascript">
+            function PreviewImage<?php echo $i;?><?php echo $FetchColor['id']; ?>() {
+            var oFReader = new FileReader();
+            oFReader.readAsDataURL(document.getElementById("uploadImage<?php echo $i;?><?php echo $FetchColor['id']; ?>").files[0]);
+            
+            oFReader.onload = function (oFREvent) {
+            document.getElementById("uploadPreview<?php echo $i;?><?php echo $FetchColor['id']; ?>").src = oFREvent.target.result;
+            };
+            };
+            
+          </script>
+          </div>
+          </div>
+          <div class="col-lg-2">
+          <div   style="width: 9rem;">
+          <img id="uploadPrevieww<?php echo $i;?><?php echo $FetchColor['id']; ?>" src="images/sh1.jpg" style="width: 100px; height: 100px; "  class="productimg"/>Size(500px(W) X 500px(H)) upto 50KB
+          <input   id="uploadImagee<?php echo $i;?><?php echo $FetchColor['id']; ?>" required type="file" name="Img2[]"  onchange="PreviewImagee<?php echo $i;?><?php echo $FetchColor['id']; ?>();" />
+          <script type="text/javascript">
+            function PreviewImagee<?php echo $i;?><?php echo $FetchColor['id']; ?>() {
+            var oFReader = new FileReader();
+            oFReader.readAsDataURL(document.getElementById("uploadImagee<?php echo $i;?><?php echo $FetchColor['id']; ?>").files[0]);
+            
+            oFReader.onload = function (oFREvent) {
+            document.getElementById("uploadPrevieww<?php echo $i;?><?php echo $FetchColor['id']; ?>").src = oFREvent.target.result;
+            };
+            };
+            
+          </script>
+          </div>
+          </div>
+          <div class="col-lg-2">
+          <div   style="width: 9rem;">
+          <img id="uploadPreviewww<?php echo $i;?><?php echo $FetchColor['id']; ?>" src="images/sh5.jpg" style="width: 100px; height: 100px; " class="productimg"/>Size(500px(W) X 500px(H)) upto 50KB
+          <input  id="uploadImageee<?php echo $i;?><?php echo $FetchColor['id']; ?>" required type="file"   name="Img3[]"  onchange="PreviewImageee<?php echo $i;?><?php echo $FetchColor['id']; ?>();" />
+          <script type="text/javascript">
+            function PreviewImageee<?php echo $i;?><?php echo $FetchColor['id']; ?>() {
+            var oFReader = new FileReader();
+            oFReader.readAsDataURL(document.getElementById("uploadImageee<?php echo $i;?><?php echo $FetchColor['id']; ?>").files[0]);
+            
+            oFReader.onload = function (oFREvent) {
+            document.getElementById("uploadPreviewww<?php echo $i;?><?php echo $FetchColor['id']; ?>").src = oFREvent.target.result;
+            };
+            };
+            
+          </script>
+          </div>
+          </div>
+          <div class="col-lg-2">
+          <div style="width: 9rem;">
+          <img id="uploadPreviewwww<?php echo $i;?><?php echo $FetchColor['id']; ?>" src="images/sh3.jpg" style="width: 100px; height: 100px; " class="productimg"/>Size(500px(W) X 500px(H)) upto 50KB
+          <input id="uploadImageeee<?php echo $i;?><?php echo $FetchColor['id']; ?>" type="file"  name="Img4[]"  onchange="PreviewImageeee<?php echo $i;?><?php echo $FetchColor['id']; ?>();" />
+          <script type="text/javascript">
+            function PreviewImageeee<?php echo $i;?><?php echo $FetchColor['id']; ?>() {
+            var oFReader = new FileReader();
+            oFReader.readAsDataURL(document.getElementById("uploadImageeee<?php echo $i;?><?php echo $FetchColor['id']; ?>").files[0]);
+            
+            oFReader.onload = function (oFREvent) {
+            document.getElementById("uploadPreviewwww<?php echo $i;?><?php echo $FetchColor['id']; ?>").src = oFREvent.target.result;
+            };
+            };
+            
+          </script>
+          </div>
+          </div>
+          <div class="col-lg-2">
+          <div  style="width: 9rem;">
+          <img id="uploadPreviewwwww<?php echo $i;?><?php echo $FetchColor['id']; ?>" src="images/sh4.jpg" style="width: 100px; height: 100px; " class="productimg"/>Size(500px(W) X 500px(H)) upto 50KB
+          <input id="uploadImageeeee<?php echo $i;?><?php echo $FetchColor['id']; ?>" type="file"  name="Img5[]"  onchange="PreviewImageeeee<?php echo $i;?><?php echo $FetchColor['id']; ?>();" />
+          <script type="text/javascript">
+            function PreviewImageeeee<?php echo $i;?><?php echo $FetchColor['id']; ?>() {
+            var oFReader = new FileReader();
+            oFReader.readAsDataURL(document.getElementById("uploadImageeeee<?php echo $i;?><?php echo $FetchColor['id']; ?>").files[0]);
+            
+            oFReader.onload = function (oFREvent) {
+            document.getElementById("uploadPreviewwwww<?php echo $i;?><?php echo $FetchColor['id']; ?>").src = oFREvent.target.result;
+            };
+            };
+            
+          </script>
+          </div>
+          </div>
+          </div>
+          </div>
+          <?php } ?>
+          <div  class="save">
+          <button type="submit" name="submit" class="btn-default-new123">Submit</button>
+          </div>                             
+          </form> 
+          <div class="footer-botom"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  </div>
+  <!-- #END# Exportable Table -->
+  </div>
+</section>
+<?php
+  include('footer.php'); ?>
